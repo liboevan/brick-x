@@ -1,1 +1,63 @@
- 
+version: '3.8'
+
+services:
+  brick-x-webapp:
+    image: el/brick-x-webapp:latest
+    container_name: el-brick-x-webapp
+    ports:
+      - "0.0.0.0:17100:17100"
+    environment:
+      - TZ=UTC
+    networks:
+      - brick-x-network
+    depends_on:
+      brick-x-auth-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:17100/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  
+  brick-x-auth-service:
+    image: el/brick-x-auth:latest
+    container_name: el-brick-x-auth
+    ports:
+      - "127.0.0.1:17101:17101"
+    environment:
+      - TZ=UTC
+    volumes:
+      - /var/lib/brick-x-auth:/var/lib/brick-x-auth
+    networks:
+      - brick-x-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:17101/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  brick-x-clock:
+    image: el/brick-x-clock:latest
+    container_name: el-brick-x-clock
+    ports:
+      - "0.0.0.0:123:123/udp"
+      - "127.0.0.1:17103:17103"
+    environment:
+      - TZ=UTC
+    cap_add:
+      - SYS_TIME
+    networks:
+      - brick-x-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:17103/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  brick-x-network:
+    name: el-brick-x-network
+    driver: bridge 

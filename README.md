@@ -55,10 +55,6 @@ docker-compose restart brick-x-auth-service
 
 ### 核心配置
 - **`docker-compose.yml`** - 服务定义和编排
-- **`scripts/start.sh`** - 启动所有服务
-- **`scripts/stop.sh`** - 停止所有服务
-- **`scripts/status.sh`** - 显示服务状态
-- **`scripts/logs.sh`** - 显示服务日志
 
 ## 🔧 Docker Compose 配置
 

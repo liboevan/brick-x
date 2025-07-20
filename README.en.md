@@ -55,10 +55,6 @@ docker-compose restart brick-x-auth-service
 
 ### Core Configuration
 - **`docker-compose.yml`** - Service definitions and orchestration
-- **`scripts/start.sh`** - Start all services
-- **`scripts/stop.sh`** - Stop all services
-- **`scripts/status.sh`** - Show service status
-- **`scripts/logs.sh`** - Show service logs
 
 ## 🔧 Docker Compose Configuration
 
