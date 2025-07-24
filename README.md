@@ -59,7 +59,7 @@ docker-compose restart brick-x-auth-service
 ## 🔧 Docker Compose 配置
 
 ### 网络
-- **el-brick-x-network**: 服务通信的桥接网络
+- **brick-x-network**: 服务通信的桥接网络
 
 ### 依赖关系
 - Webapp 依赖于 auth 服务健康状态
@@ -164,10 +164,10 @@ docker-compose logs brick-x-clock
 3. **网络问题**
    ```bash
    # 检查网络
-   docker network ls | grep el-brick-x-network
+   docker network ls | grep brick-x-network
    
    # 如需要重新创建
-   docker network rm el-brick-x-network
+   docker network rm brick-x-network
    docker-compose up -d
    ```
 
@@ -185,9 +185,9 @@ curl http://localhost:17100/
 curl http://localhost:17103/health
 
 # 检查容器详情
-docker inspect el-brick-x-auth-service
-docker inspect el-brick-x-webapp
-docker inspect el-brick-x-clock
+docker inspect brick-x-auth-service
+docker inspect brick-x-webapp
+docker inspect brick-x-clock
 ```
 
 ## 🎯 最佳实践
@@ -196,4 +196,4 @@ docker inspect el-brick-x-clock
 2. **使用 compose 进行编排** - 让 compose 处理多服务协调
 3. **监控健康检查** - 确保服务健康后再继续
 4. **查看日志** - 使用 `docker-compose logs` 监控服务状态
-5. **备份配置** - 备份 `docker-compose.yml` 文件 
+5. **备份配置** - 备份 `docker-compose.yml` 文件
