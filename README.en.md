@@ -14,7 +14,7 @@ This directory contains Docker Compose orchestration configuration for the Brick
 
 ### Service Composition
 - **brick-x-auth-service**: Authentication service (port 17101)
-- **brick-x-webapp**: Web application (port 17100)
+- **brick-x-webapp**: Web application (port 17107)
 - **brick-x-clock**: Clock service (port 17103)
 
 ## 🚀 Quick Start
@@ -59,7 +59,7 @@ docker-compose restart brick-x-auth-service
 ## 🔧 Docker Compose Configuration
 
 ### Network
-- **el-brick-x-network**: Bridge network for service communication
+- **brick-x-network**: Bridge network for service communication
 
 ### Dependencies
 - Webapp depends on auth service health status
@@ -68,13 +68,13 @@ docker-compose restart brick-x-auth-service
 
 ### Health Checks
 - Auth service: `http://localhost:17101/health`
-- Webapp: `http://localhost:17100/`
+- Webapp: `http://localhost:17107/`
 - Clock service: `http://localhost:17103/health`
 
 ## 🌐 Service Addresses
 
 - **Authentication Service**: http://localhost:17101
-- **Web Application**: http://localhost:17100
+- **Web Application**: http://localhost:17107
 - **Clock Service**: http://localhost:17103
 
 ## 📊 Monitoring
@@ -157,17 +157,17 @@ docker-compose logs brick-x-clock
    
    # Manual endpoint testing
    curl http://localhost:17101/health
-   curl http://localhost:17100/
+   curl http://localhost:17107/
    curl http://localhost:17103/health
    ```
 
 3. **Network Issues**
    ```bash
    # Check network
-   docker network ls | grep el-brick-x-network
+   docker network ls | grep brick-x-network
    
    # Recreate if needed
-   docker network rm el-brick-x-network
+   docker network rm brick-x-network
    docker-compose up -d
    ```
 
@@ -181,13 +181,13 @@ docker-compose logs --tail 50
 
 # Test endpoints
 curl http://localhost:17101/health
-curl http://localhost:17100/
+curl http://localhost:17107/
 curl http://localhost:17103/health
 
 # Check container details
-docker inspect el-brick-x-auth-service
-docker inspect el-brick-x-webapp
-docker inspect el-brick-x-clock
+docker inspect brick-x-auth-service
+docker inspect brick-x-webapp
+docker inspect brick-x-clock
 ```
 
 ## 🎯 Best Practices
@@ -196,4 +196,4 @@ docker inspect el-brick-x-clock
 2. **Use compose for orchestration** - Let compose handle multi-service coordination
 3. **Monitor health checks** - Ensure services are healthy before proceeding
 4. **View logs** - Use `docker-compose logs` to monitor service status
-5. **Backup configuration** - Backup `docker-compose.yml` file 
+5. **Backup configuration** - Backup `docker-compose.yml` file

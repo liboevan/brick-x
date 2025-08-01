@@ -5,22 +5,32 @@ services:
     image: brick-x-webapp:latest
     container_name: brick-x-webapp
     ports:
-      - "0.0.0.0:17100:17100"
+      - "127.0.0.1:17107:17107"
     environment:
       - TZ=UTC
     networks:
       - brick-x-network
     depends_on:
-      brick-x-auth-service:
+      brick-x-auth:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:17100/"]
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:17107/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.brick-x-webapp.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.brick-x-webapp.entrypoints=web"
+      - "traefik.http.services.brick-x-webapp.loadbalancer.server.port=17107"
+      - "traefik.http.middlewares.brick-x-login-rewrite.replacepath.path=/auth/login"
+      - "traefik.http.routers.brick-x-login.rule=PathPrefix(`/login`)"
+      - "traefik.http.routers.brick-x-login.entrypoints=web"
+      - "traefik.http.routers.brick-x-login.middlewares=brick-x-login-rewrite@docker"
+      - "traefik.http.routers.brick-x-login.service=brick-x-auth@docker"
   
-  brick-x-auth-service:
+  brick-x-auth:
     image: brick-x-auth:latest
     container_name: brick-x-auth
     ports:
@@ -37,6 +47,33 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.brick-x-auth.rule=PathPrefix(`/api/auth`)"
+      - "traefik.http.routers.brick-x-auth.entrypoints=web"
+      - "traefik.http.services.brick-x-auth.loadbalancer.server.port=17101"
+      - "traefik.http.middlewares.brick-x-auth-stripprefix.stripprefix.prefixes=/api/auth"
+      - "traefik.http.routers.brick-x-auth.middlewares=brick-x-auth-stripprefix@docker"
+
+  brick-x-trae:
+    image: traefik:v2.9
+    container_name: brick-x-trae
+    ports:
+      - "0.0.0.0:17100:17100"
+      - "0.0.0.0:17109:17109"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - brick-x-network
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --entrypoints.traefik.address=:17109
+      - --entrypoints.web.address=:17100
+      - --log.level=DEBUG
+      - --accesslog=true
 
   brick-x-clock:
     image: brick-x-clock:latest
@@ -56,8 +93,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.brick-x-clock.rule=PathPrefix(`/api/clock`)"
+      - "traefik.http.routers.brick-x-clock.entrypoints=web"
+      - "traefik.http.services.brick-x-clock.loadbalancer.server.port=17103"
+      - "traefik.http.middlewares.brick-x-clock-stripprefix.stripprefix.prefixes=/api/clock"
+      - "traefik.http.routers.brick-x-clock.middlewares=brick-x-clock-stripprefix@docker"
 
 networks:
   brick-x-network:
     name: brick-x-network
-    driver: bridge 
+    driver: bridge

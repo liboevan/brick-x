@@ -14,7 +14,7 @@
 
 ### 服务组成
 - **brick-x-auth-service**: 认证服务 (端口 17101)
-- **brick-x-webapp**: Web 应用 (端口 17100)
+- **brick-x-webapp**: Web 应用 (端口 17107)
 - **brick-x-clock**: 时钟服务 (端口 17103)
 
 ## 🚀 快速开始
@@ -68,13 +68,13 @@ docker-compose restart brick-x-auth-service
 
 ### 健康检查
 - Auth 服务: `http://localhost:17101/health`
-- Webapp: `http://localhost:17100/`
+- Webapp: `http://localhost:17107/`
 - Clock 服务: `http://localhost:17103/health`
 
 ## 🌐 服务地址
 
 - **认证服务**: http://localhost:17101
-- **Web 应用**: http://localhost:17100
+- **Web 应用**: http://localhost:17107
 - **时钟服务**: http://localhost:17103
 
 ## 📊 监控
@@ -157,7 +157,7 @@ docker-compose logs brick-x-clock
    
    # 手动测试端点
    curl http://localhost:17101/health
-   curl http://localhost:17100/
+   curl http://localhost:17107/
    curl http://localhost:17103/health
    ```
 
@@ -181,7 +181,7 @@ docker-compose logs --tail 50
 
 # 测试端点
 curl http://localhost:17101/health
-curl http://localhost:17100/
+curl http://localhost:17107/
 curl http://localhost:17103/health
 
 # 检查容器详情
