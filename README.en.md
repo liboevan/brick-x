@@ -13,9 +13,10 @@ This directory contains Docker Compose orchestration configuration for the Brick
 - **Health Monitoring** - Ensure correct service startup order
 
 ### Service Composition
-- **brick-x-auth-service**: Authentication service (port 17101)
-- **brick-x-webapp**: Web application (port 17107)
-- **brick-x-clock**: Clock service (port 17103)
+- **traefik**: Reverse proxy service (port 17000)
+- **brick-x-auth-service**: Authentication service (port 17001)
+- **brick-x-webapp**: Web application (port 17007)
+- **brick-x-clock**: Clock service (port 17003)
 
 ## 🚀 Quick Start
 
@@ -67,15 +68,17 @@ docker-compose restart brick-x-auth-service
 - Health checks ensure correct startup order
 
 ### Health Checks
-- Auth service: `http://localhost:17101/health`
-- Webapp: `http://localhost:17107/`
-- Clock service: `http://localhost:17103/health`
+- Traefik: `http://localhost:17000/dashboard/`
+- Auth service: `http://localhost:17001/health`
+- Webapp: `http://localhost:17007/`
+- Clock service: `http://localhost:17003/health`
 
 ## 🌐 Service Addresses
 
-- **Authentication Service**: http://localhost:17101
-- **Web Application**: http://localhost:17107
-- **Clock Service**: http://localhost:17103
+- **Traefik Dashboard**: http://localhost:17000/dashboard/
+- **Authentication Service**: http://localhost:17001
+- **Web Application**: http://localhost:17007
+- **Clock Service**: http://localhost:17003
 
 ## 📊 Monitoring
 
@@ -156,9 +159,9 @@ docker-compose logs brick-x-clock
    docker-compose logs
    
    # Manual endpoint testing
-   curl http://localhost:17101/health
-   curl http://localhost:17107/
-   curl http://localhost:17103/health
+   curl http://localhost:17001/health
+   curl http://localhost:17007/
+   curl http://localhost:17003/health
    ```
 
 3. **Network Issues**
@@ -180,9 +183,9 @@ docker-compose ps
 docker-compose logs --tail 50
 
 # Test endpoints
-curl http://localhost:17101/health
-curl http://localhost:17107/
-curl http://localhost:17103/health
+curl http://localhost:17001/health
+curl http://localhost:17007/
+curl http://localhost:17003/health
 
 # Check container details
 docker inspect brick-x-auth-service

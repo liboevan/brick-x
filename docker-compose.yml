@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  brick-x-trae:
+    image: traefik:v2.9
+    container_name: brick-x-trae
+    ports:
+      - "0.0.0.0:17100:17100"
+      - "0.0.0.0:17109:17109"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - brick-x-network
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --entrypoints.traefik.address=:17109
+      - --entrypoints.web.address=:17100
+      - --log.level=DEBUG
+      - --accesslog=true
+  
   brick-x-webapp:
     image: brick-x-webapp:latest
     container_name: brick-x-webapp
@@ -54,26 +74,6 @@ services:
       - "traefik.http.services.brick-x-auth.loadbalancer.server.port=17101"
       - "traefik.http.middlewares.brick-x-auth-stripprefix.stripprefix.prefixes=/api/auth"
       - "traefik.http.routers.brick-x-auth.middlewares=brick-x-auth-stripprefix@docker"
-
-  brick-x-trae:
-    image: traefik:v2.9
-    container_name: brick-x-trae
-    ports:
-      - "0.0.0.0:17100:17100"
-      - "0.0.0.0:17109:17109"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - brick-x-network
-    command:
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --api.insecure=true
-      - --api.dashboard=true
-      - --entrypoints.traefik.address=:17109
-      - --entrypoints.web.address=:17100
-      - --log.level=DEBUG
-      - --accesslog=true
 
   brick-x-clock:
     image: brick-x-clock:latest

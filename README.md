@@ -13,9 +13,10 @@
 - **健康监控** - 确保服务正确启动顺序
 
 ### 服务组成
-- **brick-x-auth-service**: 认证服务 (端口 17101)
-- **brick-x-webapp**: Web 应用 (端口 17107)
-- **brick-x-clock**: 时钟服务 (端口 17103)
+- **traefik**: 反向代理服务 (端口 17000)
+- **brick-x-auth-service**: 认证服务 (端口 17001)
+- **brick-x-webapp**: Web 应用 (端口 17007)
+- **brick-x-clock**: 时钟服务 (端口 17003)
 
 ## 🚀 快速开始
 
@@ -67,15 +68,16 @@ docker-compose restart brick-x-auth-service
 - 健康检查确保正确的启动顺序
 
 ### 健康检查
-- Auth 服务: `http://localhost:17101/health`
-- Webapp: `http://localhost:17107/`
-- Clock 服务: `http://localhost:17103/health`
+- Auth 服务: `http://localhost:17001/health`
+- Webapp: `http://localhost:17007/`
+- Clock 服务: `http://localhost:17003/health`
 
 ## 🌐 服务地址
 
-- **认证服务**: http://localhost:17101
-- **Web 应用**: http://localhost:17107
-- **时钟服务**: http://localhost:17103
+- **Traefik 控制台**: http://localhost:17009/dashboard/
+- **认证服务**: http://localhost:17001
+- **Web 应用**: http://localhost:17007
+- **时钟服务**: http://localhost:17003
 
 ## 📊 监控
 
@@ -156,9 +158,9 @@ docker-compose logs brick-x-clock
    docker-compose logs
    
    # 手动测试端点
-   curl http://localhost:17101/health
-   curl http://localhost:17107/
-   curl http://localhost:17103/health
+   curl http://localhost:17001/health
+   curl http://localhost:17007/
+   curl http://localhost:17003/health
    ```
 
 3. **网络问题**
@@ -180,9 +182,9 @@ docker-compose ps
 docker-compose logs --tail 50
 
 # 测试端点
-curl http://localhost:17101/health
-curl http://localhost:17107/
-curl http://localhost:17103/health
+curl http://localhost:17001/health
+curl http://localhost:17007/
+curl http://localhost:17003/health
 
 # 检查容器详情
 docker inspect brick-x-auth-service
