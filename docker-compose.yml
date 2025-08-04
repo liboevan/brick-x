@@ -44,6 +44,7 @@ services:
       - "traefik.http.routers.brick-x-webapp.rule=PathPrefix(`/`)"
       - "traefik.http.routers.brick-x-webapp.entrypoints=web"
       - "traefik.http.services.brick-x-webapp.loadbalancer.server.port=17107"
+      - "traefik.http.routers.brick-x-webapp.service=brick-x-webapp@docker"
       - "traefik.http.middlewares.brick-x-login-rewrite.replacepath.path=/auth/login"
       - "traefik.http.routers.brick-x-login.rule=PathPrefix(`/login`)"
       - "traefik.http.routers.brick-x-login.entrypoints=web"
@@ -72,6 +73,7 @@ services:
       - "traefik.http.routers.brick-x-auth.rule=PathPrefix(`/api/auth`)"
       - "traefik.http.routers.brick-x-auth.entrypoints=web"
       - "traefik.http.services.brick-x-auth.loadbalancer.server.port=17101"
+      - "traefik.http.routers.brick-x-auth.service=brick-x-auth@docker"
       - "traefik.http.middlewares.brick-x-auth-stripprefix.stripprefix.prefixes=/api/auth"
       - "traefik.http.routers.brick-x-auth.middlewares=brick-x-auth-stripprefix@docker"
 
@@ -98,6 +100,7 @@ services:
       - "traefik.http.routers.brick-x-clock.rule=PathPrefix(`/api/clock`)"
       - "traefik.http.routers.brick-x-clock.entrypoints=web"
       - "traefik.http.services.brick-x-clock.loadbalancer.server.port=17103"
+      - "traefik.http.routers.brick-x-clock.service=brick-x-clock@docker"
       - "traefik.http.middlewares.brick-x-clock-stripprefix.stripprefix.prefixes=/api/clock"
       - "traefik.http.routers.brick-x-clock.middlewares=brick-x-clock-stripprefix@docker"
 
