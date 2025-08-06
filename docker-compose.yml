@@ -77,6 +77,33 @@ services:
       - "traefik.http.middlewares.brick-x-auth-stripprefix.stripprefix.prefixes=/api/auth"
       - "traefik.http.routers.brick-x-auth.middlewares=brick-x-auth-stripprefix@docker"
 
+  brick-x-core:
+    image: brick-x-core:latest
+    container_name: brick-x-core
+    ports:
+      - "127.0.0.1:17102:17102"
+    environment:
+      - TZ=UTC
+    networks:
+      - brick-x-network
+    depends_on:
+      brick-x-auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:17102/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.brick-x-core.rule=PathPrefix(`/api/core`)"
+      - "traefik.http.routers.brick-x-core.entrypoints=web"
+      - "traefik.http.services.brick-x-core.loadbalancer.server.port=17102"
+      - "traefik.http.routers.brick-x-core.service=brick-x-core@docker"
+      - "traefik.http.middlewares.brick-x-core-stripprefix.stripprefix.prefixes=/api/core"
+      - "traefik.http.routers.brick-x-core.middlewares=brick-x-core-stripprefix@docker"
+
   brick-x-clock:
     image: brick-x-clock:latest
     container_name: brick-x-clock
