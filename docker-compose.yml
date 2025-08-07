@@ -20,6 +20,16 @@ services:
       - --entrypoints.web.address=:17100
       - --log.level=DEBUG
       - --accesslog=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.brick-x-trae.loadbalancer.server.port=17109"
+      - "traefik.http.routers.brick-x-trae.service=brick-x-trae@docker"
+      - "traefik.http.routers.gateway.rule=PathPrefix(`/gateway`)"
+      - "traefik.http.routers.gateway.entrypoints=web"
+      - "traefik.http.routers.gateway.middlewares=brick-x-gateway-redirect@docker"
+      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.regex=^http://(.*):17100/gateway(.*)$"
+      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.replacement=http://$1:17109$2"
+      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.permanent=true"
   
   brick-x-webapp:
     image: brick-x-webapp:latest
@@ -58,8 +68,6 @@ services:
       - "127.0.0.1:17101:17101"
     environment:
       - TZ=UTC
-    volumes:
-      - /var/lib/brick-x-auth:/var/lib/brick-x-auth
     networks:
       - brick-x-network
     healthcheck:
