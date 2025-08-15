@@ -14,22 +14,22 @@ services:
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
-      - --api.insecure=true
       - --api.dashboard=true
       - --entrypoints.traefik.address=:17109
       - --entrypoints.web.address=:17100
       - --log.level=DEBUG
       - --accesslog=true
     labels:
+      # Dashboard router
       - "traefik.enable=true"
-      - "traefik.http.services.brick-x-trae.loadbalancer.server.port=17109"
-      - "traefik.http.routers.brick-x-trae.service=brick-x-trae@docker"
-      - "traefik.http.routers.gateway.rule=PathPrefix(`/gateway`)"
-      - "traefik.http.routers.gateway.entrypoints=web"
-      - "traefik.http.routers.gateway.middlewares=brick-x-gateway-redirect@docker"
-      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.regex=^http://(.*):17100/gateway(.*)$"
-      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.replacement=http://$1:17109$2"
-      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.dashboard.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.dashboard.entrypoints=traefik"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      # JWT forwardAuth
+      - "traefik.http.middlewares.dashboard-auth.forwardauth.address=http://brick-x-auth:17101/auth/authorize?scope=x/layout:write"
+      - "traefik.http.middlewares.dashboard-auth.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.dashboard-auth.forwardauth.authResponseHeaders=X-User,X-Role"
   
   brick-x-webapp:
     image: brick-x-webapp:latest
