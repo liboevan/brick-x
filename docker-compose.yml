@@ -6,6 +6,7 @@ services:
     container_name: brick-x-trae
     ports:
       - "0.0.0.0:17100:17100"
+      - "0.0.0.0:17109:17109"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -13,22 +14,22 @@ services:
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      - --api.insecure=true
       - --api.dashboard=true
+      - --entrypoints.traefik.address=:17109
       - --entrypoints.web.address=:17100
       - --log.level=DEBUG
       - --accesslog=true
     labels:
-      # Dashboard router
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.priority=200"
-      - "traefik.http.routers.dashboard.rule=PathPrefix(`/dashboard/`)"
-      - "traefik.http.routers.dashboard.entrypoints=web"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
-      # JWT forwardAuth
-      - "traefik.http.middlewares.dashboard-auth.forwardauth.address=http://brick-x-auth:17101/auth/authorize?scope=x/layout:write"
-      - "traefik.http.middlewares.dashboard-auth.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.dashboard-auth.forwardauth.authResponseHeaders=Authorization,X-User,X-Role"
+      - "traefik.http.services.brick-x-trae.loadbalancer.server.port=17109"
+      - "traefik.http.routers.brick-x-trae.service=brick-x-trae@docker"
+      - "traefik.http.routers.gateway.rule=PathPrefix(`/gateway`)"
+      - "traefik.http.routers.gateway.entrypoints=web"
+      - "traefik.http.routers.gateway.middlewares=brick-x-gateway-redirect@docker"
+      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.regex=^http://(.*):17100/gateway(.*)$"
+      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.replacement=http://$1:17109$2"
+      - "traefik.http.middlewares.brick-x-gateway-redirect.redirectregex.permanent=true"
   
   brick-x-webapp:
     image: brick-x-webapp:latest
@@ -50,11 +51,15 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.brick-x-webapp.rule=PathPrefix(`/`) && !Path(`/login`) && !PathPrefix(`/dashboard/`)"
+      - "traefik.http.routers.brick-x-webapp.rule=PathPrefix(`/`)"
       - "traefik.http.routers.brick-x-webapp.entrypoints=web"
       - "traefik.http.services.brick-x-webapp.loadbalancer.server.port=17107"
       - "traefik.http.routers.brick-x-webapp.service=brick-x-webapp@docker"
-
+      - "traefik.http.middlewares.brick-x-login-rewrite.replacepath.path=/auth/login"
+      - "traefik.http.routers.brick-x-login.rule=PathPrefix(`/login`)"
+      - "traefik.http.routers.brick-x-login.entrypoints=web"
+      - "traefik.http.routers.brick-x-login.middlewares=brick-x-login-rewrite@docker"
+      - "traefik.http.routers.brick-x-login.service=brick-x-auth@docker"
   
   brick-x-auth:
     image: brick-x-auth:latest
@@ -73,21 +78,12 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      # 处理 /api/auth 路径的路由
-      - "traefik.http.routers.brick-x-auth-api.rule=PathPrefix(`/api/auth`)"
-      - "traefik.http.routers.brick-x-auth-api.entrypoints=web"
-      - "traefik.http.routers.brick-x-auth-api.service=brick-x-auth@docker"
-      - "traefik.http.middlewares.brick-x-auth-stripprefix.stripprefix.prefixes=/api/auth"
-      - "traefik.http.routers.brick-x-auth-api.middlewares=brick-x-auth-stripprefix@docker"
-      # 处理 /login 路径的路由
-      - "traefik.http.routers.brick-x-login.priority=900"
-      - "traefik.http.routers.brick-x-login.rule=Path(`/login`)"
-      - "traefik.http.middlewares.brick-x-login-replacepath.replacepath.path=/auth/login"
-      - "traefik.http.routers.brick-x-login.middlewares=brick-x-login-replacepath@docker"
-      - "traefik.http.routers.brick-x-login.entrypoints=web"
-      - "traefik.http.routers.brick-x-login.service=brick-x-auth@docker"
-
+      - "traefik.http.routers.brick-x-auth.rule=PathPrefix(`/api/auth`)"
+      - "traefik.http.routers.brick-x-auth.entrypoints=web"
       - "traefik.http.services.brick-x-auth.loadbalancer.server.port=17101"
+      - "traefik.http.routers.brick-x-auth.service=brick-x-auth@docker"
+      - "traefik.http.middlewares.brick-x-auth-stripprefix.stripprefix.prefixes=/api/auth"
+      - "traefik.http.routers.brick-x-auth.middlewares=brick-x-auth-stripprefix@docker"
 
   brick-x-core:
     image: brick-x-core:latest
